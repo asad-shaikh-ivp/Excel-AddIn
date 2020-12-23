@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-framework="typescript">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+    <link href="//db.onlinewebfonts.com/c/30b398369e663efafd064e1d824f9567?family=TeXGyreAdventor" rel="stylesheet" type="text/css"/>
+    <title>Capital Four Research Management System - Error uploading data</title>
+    <style>
+        table {
+            width: 100%;
+            table-layout: fixed;
+
+            border: 1px solid #122929;
+            font-family: 'Lato', sans-serif;
+            font-size: 12px;
+        }
+
+        td {
+            width: 3.5rem;
+            height: 1.5rem;
+            text-align: right;
+        }
+
+        th {
+            background: lightblue;
+            width: 17rem;
+            border-color: white;
+            text-align: left;
+        }
+
+        .text {
+            width: 13rem;
+            text-align: left;
+        }
+
+        body {
+            padding: 1rem 10rem 1rem 1rem;
+        }
+    </style>
+
+    <!-- <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script type="language/javascript" src="../node_modules/officejs.dialogs/dialogs.js"></script> -->
+
+
+
+    <script>
+
+        function loadData() {
+
+
+           var requestError = JSON.parse(localStorage.getItem('requestError'));
+            // if (!mnemonics) return false;
+
+            document.write(JSON.stringify(requestError))
+            //var data = JSON.stringify(mnemonics)
+
+
+            return true;
+        }
+
+
+    </script>
+
+</head>
+
+<body>
+    <!-- <div id="demo"> Text inside Dialog </div> -->
+    <h3>Error! File not found. </h3>
+    <script>
+
+        loadData()
+
+    </script>
+    <!-- <input type="button" value="Generate a table." onclick="generateTable()"> -->
+    <div id="showData"></div>
+</body>
+
+
+</html>
+
+

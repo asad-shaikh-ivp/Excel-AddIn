@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en" data-framework="typescript">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="//db.onlinewebfonts.com/c/30b398369e663efafd064e1d824f9567?family=TeXGyreAdventor" rel="stylesheet"
+        type="text/css" />
+    <title> Uploaded Data </title>
+    <style>
+        table {
+            width: 100%;
+            table-layout: fixed;
+
+            border: 1px solid #122929;
+            font-family: 'Lato', sans-serif;
+            font-size: 12px;
+        }
+
+        td {
+            width: 4rem;
+            height: 1.5rem;
+            text-align: right;
+        }
+
+        th {
+            background: lightblue;
+            width: 19rem;
+            border-color: white;
+            text-align: left;
+        }
+
+        .text {
+            width: 13rem;
+            text-align: left;
+        }
+
+        .date {
+
+            background: lightblue;
+        }
+        .summary{
+            background: #107c41;
+            color: #ffffff;
+        }
+        .cellSize{
+            background: #107c41;
+            color: #ffffff;
+            width: 5rem;
+            height: 1.5rem;
+        }
+        .margin{
+            margin-bottom: 3vh;
+        }
+
+        body {
+            padding: 1rem 10rem 1rem 1rem;
+        }
+    </style>
+
+    <!-- <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script type="language/javascript" src="../node_modules/officejs.dialogs/dialogs.js"></script>
+     -->
+    <script>
+
+        function loadData() {
+
+
+
+            var mnemonics = JSON.parse(localStorage.getItem('mnemonics'));
+            var requestData = JSON.parse(localStorage.getItem('requestData'))
+
+          //document.write(JSON.stringify(mnemonics.mnemonicList))
+          // document.write(mnemonics.mnemonicList.length)
+            //document.write(JSON.stringify(requestData.mnemonicList[2].name))
+
+            var data = JSON.stringify(mnemonics)
+
+            //document.write("Length : " + mnemonics.mnemonicList.length)
+            var start = JSON.stringify(mnemonics.mnemonicList[0].mnemonic_name)
+            var startMonth = JSON.stringify(mnemonics.mnemonicList[0].value_text);
+
+
+
+            // for (let index1 = 0; index1 < mnemonics.mnemonicList.length; index1++) {
+
+            //     if (mnemonics.mnemonicList[index1].time_dimension === "YTD") {
+            //         mnemonics.mnemonicList[index1].year = parseInt(mnemonics.mnemonicList[index1].as_of_date.substring(0, 4))
+            //         mnemonics.mnemonicList[index1].month_number = parseInt(mnemonics.mnemonicList[index1].as_of_date.substring(5, 7))
+            //         // mnemonics.mnemonicList[index1].month_number = mnemonics.mnemonicList[index1].month_number.replace(0, "")
+
+            //     }
+            //     else if (mnemonics.mnemonicList[index1].time_dimension === "LTM" && mnemonics.mnemonicList[index1].year === null) {
+            //         mnemonics.mnemonicList[index1].year = parseInt(mnemonics.mnemonicList[index1].as_of_date.substring(0, 4))
+            //         mnemonics.mnemonicList[index1].month_number = parseInt(mnemonics.mnemonicList[index1].as_of_date.substring(5, 7))
+
+            //     }
+
+            // }
+
+            var obj = mnemonics.mnemonicList[0];
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop) && obj[prop] !== null && !isNaN(obj[prop])) {
+                    obj[prop] = +obj[prop];
+                }
+            }
+            // var startMonth = JSON.stringify(mnemonics.mnemonicList[0].value_text);
+            // document.write(startMonth)
+
+
+
+
+            //FINDING UNIQUE MNEMONIC NAMES
+
+            var mnemonicSorted = [];
+
+            // document.write(JSON.stringify(distinct))
+            //   document.write("LENGTH IS " + distinct.length)
+
+            function GetSortOrder(prop) {
+                return function (a, b) {
+                    if (a[prop] > b[prop]) {
+                        return 1;
+                    } else if (a[prop] < b[prop]) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            }
+
+            
+            //SORTING DISTINCT YEARS
+            mnemonics.mnemonicList.filter(function (e) {
+                if (e.time_dimension === null) {
+                    mnemonicSorted.push(e)
+                }
+            });
+
+            // mnemonicSorted.sort(GetSortOrder("month_number"));
+            // mnemonicSorted.sort(GetSortOrder("year"));
+            mnemonics.mnemonicList.filter(function (e) {
+                if (e.time_dimension === 'Y') {
+                    mnemonicSorted.push(e)
+                }
+            });
+
+            mnemonicSorted.sort(function (a, b) {
+                return new Date(a.year) - new Date(b.year);
+            });
+
+            var mnemonicSortedQ = []
+            mnemonics.mnemonicList.filter(function (e) {
+                if (e.time_dimension === 'Q') {
+                    mnemonicSortedQ.push(e)
+                }
+            });
+
+
+            mnemonicSortedQ.sort(function (a, b) {
+                var ayear = a.year;
+                var byear = b.year;
+                var amonth = a.month_number;
+                var bmonth = b.month_number;
+                console.log(amonth + " | " + bmonth);
+
+                if (ayear == byear) {
+                    return (amonth < bmonth) ? -1 : (amonth > bmonth) ? 1 : 0;
+                }
+                else {
+                    return (ayear < byear) ? -1 : 1;
+                }
+            });
+
+            // mnemonicSortedQ.sort(GetSortOrder("month_number"));
+            // mnemonicSortedQ.sort(GetSortOrder("year"));
+            //document.write(JSON.stringify(mnemonicSortedQ))
+
+
+            var mnemonicSortedH = []
+            mnemonics.mnemonicList.filter(function (e) {
+                if (e.time_dimension === 'HY' && (e.month_number === 6 || e.month_number === 12)) {
+                    mnemonicSortedH.push(e)
+                }
+            });
+
+            mnemonicSortedH.sort(function (a, b) {
+                var ayear = a.year;
+                var byear = b.year;
+                var amonth = a.month_number;
+                var bmonth = b.month_number;
+                console.log(amonth + " | " + bmonth);
+                if (ayear == byear) {
+                    return (amonth < bmonth) ? -1 : (amonth > bmonth) ? 1 : 0;
+                }
+                else {
+                    return (ayear < byear) ? -1 : 1;
+                }
+            });
+
+            //YTD
+            var mnemonicSortedYTD = []
+            mnemonics.mnemonicList.filter(function (e) {
+                if (e.time_dimension === 'YTD') {
+                    mnemonicSortedYTD.push(e)
+                }
+            });
+
+            mnemonicSortedYTD.sort(function (a, b) {
+                var ayear = a.year;
+                var byear = b.year;
+                var amonth = a.month_number;
+                var bmonth = b.month_number;
+                console.log(amonth + " | " + bmonth);
+
+                if (ayear == byear) {
+                    return (amonth < bmonth) ? -1 : (amonth > bmonth) ? 1 : 0;
+                }
+                else {
+                    return (ayear < byear) ? -1 : 1;
+                }
+            });
+
+            // mnemonicSortedYTD.sort(GetSortOrder("month_number"));
+            // mnemonicSortedYTD.sort(GetSortOrder("year"));
+
+
+            // document.write(JSON.stringify(distinctSortedYTD))
+
+            var mnemonicSortedLTM = []
+            mnemonics.mnemonicList.filter(function (e) {
+                if (e.time_dimension === 'LTM') {
+                    mnemonicSortedLTM.push(e)
+                }
+            });
+
+            mnemonicSortedLTM.sort(function (a, b) {
+                var ayear = a.year;
+                var byear = b.year;
+                var amonth = a.month_number;
+                var bmonth = b.month_number;
+                console.log(amonth + " | " + bmonth);
+
+                if (ayear == byear) {
+                    return (amonth < bmonth) ? -1 : (amonth > bmonth) ? 1 : 0;
+                }
+                else {
+                    return (ayear < byear) ? -1 : 1;
+                }
+            });
+
+            // mnemonicSortedLTM.sort(GetSortOrder("month_number"));
+            // mnemonicSortedLTM.sort(GetSortOrder("year"));
+           
+
+            var mnemonicSorted = mnemonicSorted.concat(mnemonicSortedQ);
+            let mnemonicSortedSummary = JSON.parse(JSON.stringify(mnemonicSorted));
+            var timeDimension = 'timeDimension'; // your key here
+            var HalfYearly = false;
+
+            for (let i = 0; i < requestData.mnemonicList.length; i++) {
+                for (let j = 0; j < requestData.mnemonicList[i].dimensionValues.length; j++) {
+                    if (requestData.mnemonicList[i].dimensionValues[j].hasOwnProperty(timeDimension) && (requestData.mnemonicList[i].dimensionValues[j][timeDimension] === 'H1' || requestData.mnemonicList[i].dimensionValues[j][timeDimension] === 'H2')) {
+                       // document.write(JSON.stringify(mnemonicSortedH))
+                        mnemonicSortedSummary = mnemonicSortedSummary.concat(mnemonicSortedH);
+                        HalfYearly = true;
+                        break;
+                     }
+                     if(HalfYearly){
+                        break;
+                     }
+                }
+                if(HalfYearly){
+                        break;
+                }
+            }
+            var mnemonicSorted = mnemonicSorted.concat(mnemonicSortedH);
+            //let mnemonicSortedSummary = JSON.parse(JSON.stringify(mnemonicSorted));
+            var mnemonicSorted = mnemonicSorted.concat(mnemonicSortedLTM)
+            mnemonicSortedSummary = mnemonicSortedSummary.concat(mnemonicSortedLTM);
+           
+            var mnemonicSorted = mnemonicSorted.concat(mnemonicSortedYTD)
+
+            var obj = {}, obj1 = []
+            for (let index = 0; index < mnemonicSorted.length; index++) {
+                obj[mnemonicSorted[index].mnemonic_name] = (obj[mnemonicSorted[index].mnemonic_name] + 1 || 1);
+            }
+
+            var obj2 = {}
+            for (let index = 0; index < requestData.mnemonicList.length; index++) {
+                requestData.mnemonicList[index].name = requestData.mnemonicList[index].name.toUpperCase()
+                obj2[requestData.mnemonicList[index].name] = (obj2[requestData.mnemonicList[index].name] + 1 || 1);
+            }
+
+            //document.write(JSON.stringify(mnemonicSorted))
+            // document.write(JSON.stringify(obj2))
+
+            var mnemonicList = []
+            var mnemonicListClone = []
+            for (var key in obj2) {
+                for (let index1 = 0; index1 < mnemonicSorted.length; index1++) {
+                    //mnemonicSorted[index1].year !==null &&
+                    // document.write(JSON.stringify(mnemonicSorted[index1].mnemonic_name))
+                    if ((mnemonicSorted[index1].value_text !== null || mnemonicSorted[index1].value_num !== "")
+                        && mnemonicSorted[index1].mnemonic_name !== "UD_C4_CALENDAR_DATE"
+                    ) {
+                        if (mnemonicSorted[index1].mnemonic_name === key) {
+
+                            mnemonicList.push(mnemonicSorted[index1])
+                        } 
+                    }
+                  
+                }
+            }
+
+            for (var key in obj2) {
+                for (let index1 = 0; index1 < mnemonicSortedSummary.length; index1++) {
+                    
+                    if ((mnemonicSortedSummary[index1].value_text !== null || mnemonicSortedSummary[index1].value_num !== "")
+                        && mnemonicSortedSummary[index1].mnemonic_name !== "UD_C4_CALENDAR_DATE"
+                    ) {
+                        if (mnemonicSortedSummary[index1].mnemonic_name === key) {
+
+                            mnemonicListClone.push(mnemonicSortedSummary[index1])
+                        } 
+                    }
+
+                }
+            }
+           
+            //document.write(JSON.stringify(mnemonicList.length))
+
+
+
+            var distinct = [];
+            mnemonicList.forEach(function (item) {
+                var isPresent = distinct.filter(function (elem) {
+                    return elem.year === item.year && elem.time_dimension === item.time_dimension
+                        && elem.month_number === item.month_number
+                })
+                if (isPresent.length == 0) {
+                    distinct.push(item)
+                }
+            })
+            // document.write(JSON.stringify(distinct))
+            //   document.write("LENGTH IS " + distinct.length)
+
+            function GetSortOrder(prop) {
+                return function (a, b) {
+                    if (a[prop] > b[prop]) {
+                        return 1;
+                    } else if (a[prop] < b[prop]) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            }
+
+
+            var distinctSorted = []
+
+
+
+            //SORTING DISTINCT YEARS
+            distinct.filter(function (e) {
+                if (e.time_dimension === null) {
+                    distinctSorted.push(e)
+                }
+            });
+            distinct.filter(function (e) {
+                if (e.time_dimension === 'Y' && e.year !== null) {
+                    distinctSorted.push(e)
+                }
+            });
+            distinctSorted.sort(function (a, b) {
+                return new Date(a.year) - new Date(b.year);
+            });
+
+            var distinctSortedQ = []
+            distinct.filter(function (e) {
+                if (e.time_dimension === 'Q' && e.year !== null) {
+                    distinctSortedQ.push(e)
+                }
+            });
+
+            distinctSortedQ.sort(GetSortOrder("month_number"));
+            distinctSortedQ.sort(GetSortOrder("year"));
+
+            var distinctSortedH = []
+            distinct.filter(function (e) {
+                if (e.time_dimension === 'HY') {
+                    distinctSortedH.push(e)
+                }
+            });
+
+            distinctSortedH.sort(GetSortOrder("month_number"));
+            distinctSortedH.sort(GetSortOrder("year"));
+
+            //YTD
+            var distinctSortedYTD = []
+            distinct.filter(function (e) {
+                if (e.time_dimension === 'YTD' && e.year !== null) {
+                    distinctSortedYTD.push(e)
+                }
+            });
+
+            distinctSortedYTD.sort(GetSortOrder("month_number"));
+            distinctSortedYTD.sort(GetSortOrder("year"));
+
+            //   document.writeln("XXXXXXXXXX")
+            // document.write(JSON.stringify(distinctSortedYTD))
+
+            var distinctSortedLTM = []
+            distinct.filter(function (e) {
+                if (e.time_dimension === 'LTM' && e.year !== null) {
+                    distinctSortedLTM.push(e)
+                }
+            });
+
+            // //document.write(JSON.stringify(distinctSortedLTM))
+            distinctSortedLTM.sort(GetSortOrder("month_number"));
+            distinctSortedLTM.sort(GetSortOrder("year"));
+
+
+            //  document.write(JSON.stringify(distinctSortedLTM))
+           
+
+             //    var timeDimension = 'timeDimension'; // your key here
+            // for (let i = 0; i < requestData.mnemonicList.length; i++) {
+            //     for (let j = 0; j < requestData.mnemonicList[i].dimensionValues.length; j++) {
+            //         if (requestData.mnemonicList[i].dimensionValues[j].hasOwnProperty(timeDimension) && (requestData.mnemonicList[i].dimensionValues[j][timeDimension] === 'H1' || requestData.mnemonicList[i].dimensionValues[j][timeDimension] === 'H2')) {
+            //             document.write(JSON.stringify(mnemonicSortedH))
+            //             mnemonicSorted = mnemonicSorted.concat(mnemonicSortedH);
+            //             break;
+            //          }
+
+            //     }
+                
+            // }
+            
+           // document.write(JSON.stringify(distinctSortedQ));
+            var distinctSorted = distinctSorted.concat(distinctSortedQ);
+            var distinctSortedClone1 = JSON.parse(JSON.stringify(distinctSorted));
+           
+            var distinctSorted = distinctSorted.concat(distinctSortedH);
+            if(HalfYearly){
+                var distinctSortedCloneH = JSON.parse(JSON.stringify(distinctSortedH));
+                var distinctSortedClone1 = distinctSortedClone1.concat(distinctSortedCloneH);
+            }
+
+            var distinctSorted = distinctSorted.concat(distinctSortedLTM)
+            var distinctSortedCloneLTM = JSON.parse(JSON.stringify(distinctSortedLTM));
+            var distinctSortedClone1 = distinctSortedClone1.concat(distinctSortedCloneLTM);
+            //let distinctSortedClone1 = JSON.parse(JSON.stringify(distinctSorted));
+            var distinctSorted = distinctSorted.concat(distinctSortedYTD)
+
+           
+         //   document.write(JSON.stringify(mnemonicListClone.length))
+         //  document.write(JSON.stringify(distinctSortedClone1));
+            //  document.write(distinctSorted.length+ "          ")
+
+
+
+            //document.write(JSON.stringify(distinct))
+
+            let distinctSortedClone = JSON.parse(JSON.stringify(distinctSorted));
+            
+
+
+
+            let distinctSortedClone2 = JSON.parse(JSON.stringify(distinctSortedClone1));
+           
+
+
+            var values = Object.values(obj)
+
+
+            var addToObject = function (obj, key, value, index) {
+                var temp = {};
+                var i = 0;
+                for (var prop in obj) {
+                    if (obj.hasOwnProperty(prop)) {
+                        if (i === index && key && value) {
+                            temp[key] = value;
+                        }
+                        temp[prop] = obj[prop];
+                        i++;
+                    }
+                }
+                if (!index && key && value) {
+                    temp[key] = value;
+                }
+                return temp;
+            };
+
+            var keys = Object.keys(obj2);
+
+
+
+            // var Calendar = addToObject(obj, 'UD_C4_CALENDAR_DATE',distinct.length-1 , i+1);
+
+
+
+            var body = document.getElementsByTagName("body")[0];
+
+            var tab = document.createElement("table")
+            var tabBody = document.createElement("tbody")
+            var x = 0;
+            var CASH_AND_EQUIVALENTS = []
+            var SR_SEC_DEBT = []
+            var SR_UNSEC_DEBT = []
+            var TOTAL_DEBT = [] 
+            var SR_SEC_LEVERAGE = []
+            var SR_UNSEC_LEVERAGE = []
+            var TOTAL_LEVERAGE = []
+
+
+            for (let index = 0; index < Object.keys(obj2).length; index++) {
+                if(keys[index] === "UD_C4_SR_SEC_DEBT"){
+                    var temp = x;
+                    var secIndex =0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                SR_SEC_DEBT.push(mnemonicListClone[temp])
+                                temp++;
+                                secIndex++;
+                        } else {
+                            SR_SEC_DEBT.push(distinctSortedClone1[index2])
+                            SR_SEC_DEBT[secIndex].mnemonic_name = "UD_C4_SR_SEC_DEBT"
+                            SR_SEC_DEBT[secIndex].value_num = 0
+                            secIndex++;
+                        }
+                    }
+                  
+                }
+
+                if(keys[index] === "UD_C4_SR_UNSEC_DEBT"){
+                    var temp = x;
+                    var unSecDebtIndexIndex = 0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                SR_UNSEC_DEBT.push(mnemonicListClone[temp])
+                                temp++;
+                                unSecDebtIndexIndex++;
+                        } else {
+                            SR_UNSEC_DEBT.push(distinctSortedClone1[index2])
+                            SR_UNSEC_DEBT[unSecDebtIndexIndex].mnemonic_name = "UD_C4_SR_UNSEC_DEBT"
+                            SR_UNSEC_DEBT[unSecDebtIndexIndex].value_num = 0
+                            unSecDebtIndexIndex++;
+                        }
+                    }
+                    // while(mnemonicListClone[temp].mnemonic_name === keys[index]){
+                    //     SR_UNSEC_DEBT.push(mnemonicListClone[temp])
+                    //     temp++;
+                    // }
+
+                }
+
+                
+                if(keys[index] === "UD_C4_TOTAL_DEBT"){
+                    var temp = x;
+                    var totalDebtIndex = 0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                TOTAL_DEBT.push(mnemonicListClone[temp])
+                                temp++;
+                                totalDebtIndex++;
+                        } else {
+                            TOTAL_DEBT.push(distinctSortedClone1[index2])
+                            TOTAL_DEBT[totalDebtIndex].mnemonic_name = "UD_C4_TOTAL_DEBT"
+                            TOTAL_DEBT[totalDebtIndex].value_num = 0
+                            totalDebtIndex++;
+                        }
+                    }
+
+                }
+
+
+            //     var SR_SEC_LEVERAGE = []
+            // var SR_UNSEC_LEVERAGE = []
+            // var TOTAL_LEVERAGE = []
+
+                if(keys[index] === "UD_C4_SR_SEC_LEVERAGE"){
+                    
+                    var temp = x;
+                    var secLeverageIndex = 0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                SR_SEC_LEVERAGE.push(mnemonicListClone[temp])
+                                temp++;
+                                secLeverageIndex++;
+                        } else {
+                            SR_SEC_LEVERAGE.push(distinctSortedClone1[index2])
+                            SR_SEC_LEVERAGE[secLeverageIndex].mnemonic_name = "UD_C4_SR_SEC_LEVERAGE"
+                            SR_SEC_LEVERAGE[secLeverageIndex].value_num = " "
+                            secLeverageIndex++;
+                        }
+                    }
+
+                }
+
+                if(keys[index] === "UD_C4_SR_UNSEC_LEVERAGE"){
+                    var temp = x;
+                    var unsecLeverageIndex = 0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                SR_UNSEC_LEVERAGE.push(mnemonicListClone[temp])
+                                temp++;
+                                unsecLeverageIndex++;
+                        } else {
+                            SR_UNSEC_LEVERAGE.push(distinctSortedClone1[index2])
+                            SR_UNSEC_LEVERAGE[unsecLeverageIndex].mnemonic_name = "UD_C4_SR_UNSEC_LEVERAGE"
+                            SR_UNSEC_LEVERAGE[unsecLeverageIndex].value_num = " "
+                            unsecLeverageIndex++;
+                        }
+                    }
+
+                }
+
+                if(keys[index] === "UD_C4_TOTAL_LEVERAGE"){
+                    var temp = x;
+                    var totalLeverageIndex = 0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                TOTAL_LEVERAGE.push(mnemonicListClone[temp])
+                                temp++;
+                                totalLeverageIndex++;
+                        } else {
+                            TOTAL_LEVERAGE.push(distinctSortedClone1[index2])
+                            TOTAL_LEVERAGE[totalLeverageIndex].mnemonic_name = "UD_C4_TOTAL_LEVERAGE"
+                            TOTAL_LEVERAGE[totalLeverageIndex].value_num = " "
+                            totalLeverageIndex++;
+                        }
+                    }
+
+                }
+
+                if(keys[index] === "UD_C4_CASH_AND_EQUIVALENTS"){
+                    var temp = x;
+                    var cashEquiIndex = 0
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                }
+                                CASH_AND_EQUIVALENTS.push(mnemonicListClone[temp])
+                                temp++;
+                                cashEquiIndex++;
+                        } else {
+                            CASH_AND_EQUIVALENTS.push(distinctSortedClone1[index2])
+                            CASH_AND_EQUIVALENTS[cashEquiIndex].mnemonic_name = "UD_C4_CASH_AND_EQUIVALENTS"
+                            CASH_AND_EQUIVALENTS[cashEquiIndex].value_num = 0
+                            cashEquiIndex++;
+                        }
+                    }
+                 //  document.write(JSON.stringify(CASH_AND_EQUIVALENTS))
+                }
+
+                for (let index2 = 0; index2 < distinctSortedClone1.length; index2++) {
+                    if(mnemonicListClone[x].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[x].year === distinctSortedClone1[index2].year
+                    && mnemonicListClone[x].mnemonic_name === keys[index] && mnemonicListClone[x].time_dimension === distinctSortedClone1[index2].time_dimension){
+                                if (x === mnemonicListClone.length - 1) {
+                                // document.write("VANILLA")
+                                x = x;
+
+                            } else {
+
+                                x++;
+
+                            }
+                        }
+                } 
+
+            }
+
+            x = 0
+            for (let index = 0; index < Object.keys(obj2).length; index++) {
+                    
+                if (keys[index] === "UD_C4_CALENDAR_DATE") {
+                    continue;
+                }
+                
+                if (keys[index - 2] === "UD_C4_CURRENCY") {
+
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    cell.setAttribute('class', 'summary')
+                    var cellHead = document.createTextNode('UD_C4_CALENDAR_DATE')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let i = 1; i < distinctSortedClone1.length; i++) {
+                        if (distinctSortedClone1[i].as_of_date === null) {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(" ")
+
+                        } else {
+                            var cell = document.createElement("td")
+                            distinctSortedClone1[i].as_of_date = distinctSortedClone1[i].as_of_date.substring(0, distinctSortedClone1[i].as_of_date.indexOf("T"));
+                            var cellText = document.createTextNode(distinctSortedClone1[i].as_of_date)
+                            cell.setAttribute('class', 'cellSize')
+                        }
+
+                        cell.appendChild(cellText)
+                        row.appendChild(cell)
+                    }
+                    tabBody.appendChild(row);
+                }
+
+
+                if(keys[index] === "UD_C4_TOTAL_REVENUE"){
+                    var temp = x;
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    cell.setAttribute('class', 'summary')
+                    var cellHead = document.createTextNode('Revenue')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                       //document.write(JSON.stringify(mnemonicListClone[temp].month_number + " " + distinctSortedClone1[index2].month_number + " " + mnemonicListClone[temp].value_num + mnemonicListClone[temp].mnemonic_name))
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                            && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                            mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                            
+                            if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                            }
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(mnemonicListClone[temp].value_num)
+                            cell.appendChild(cellText)
+                            row.appendChild(cell)
+                            temp++;
+                        } else {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(" ")
+                            cell.appendChild(cellText);
+                            row.appendChild(cell);
+                        }
+                        
+                    }
+                    tabBody.appendChild(row)
+                }
+
+
+                if(keys[index] === "UD_C4_C4_EBITDA"){
+                    var temp = x;
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    cell.setAttribute('class', 'summary')
+                    var cellHead = document.createTextNode('C4 EBITDA')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                        
+                        if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                            && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                            mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                            
+                            if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                            }
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(mnemonicListClone[temp].value_num)
+                            cell.appendChild(cellText)
+                            row.appendChild(cell)
+                            temp++;
+                        } else {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(" ")
+                            cell.appendChild(cellText);
+                            row.appendChild(cell);
+                        }
+                        
+                    }
+                    tabBody.appendChild(row)
+
+                    if(SR_SEC_LEVERAGE.length !== 0){
+                        var filtered_SR_SEC_LEVERAGE = 
+                        SR_SEC_LEVERAGE.filter((item) => item.mnemonic_name === "UD_C4_SR_SEC_LEVERAGE")
+                        var count = 0;
+                        var temp = x;
+                        var row = document.createElement("tr");
+                        var cell = document.createElement("th")
+                        cell.setAttribute('class', 'summary')
+                        var cellHead = document.createTextNode('UD_C4_SR_SEC_LEVERAGE')
+                        cell.appendChild(cellHead)
+                        row.appendChild(cell)
+                        for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                            // document.write(JSON.stringify(mnemonicListClone[temp].month_number + " " + distinctSortedClone1[index2].month_number))
+                            if (count !== filtered_SR_SEC_LEVERAGE.length && filtered_SR_SEC_LEVERAGE[count].month_number === distinctSortedClone1[index2].month_number && filtered_SR_SEC_LEVERAGE[count].year === distinctSortedClone1[index2].year
+                               && filtered_SR_SEC_LEVERAGE[count].time_dimension === distinctSortedClone1[index2].time_dimension )  {
+                                filtered_SR_SEC_LEVERAGE[count].value_num = Number(filtered_SR_SEC_LEVERAGE[count].value_num)
+                               
+                                if (!Number.isInteger(filtered_SR_SEC_LEVERAGE[count].value_num)) {
+                                    filtered_SR_SEC_LEVERAGE[count].value_num = filtered_SR_SEC_LEVERAGE[count].value_num.toFixed(2);
+                                }
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(filtered_SR_SEC_LEVERAGE[count].value_num)
+                                cell.appendChild(cellText)
+                                row.appendChild(cell)
+                                temp++;
+                                count++;
+                            } else {
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(" ")
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                            }
+                            
+                        }
+                        tabBody.appendChild(row)
+
+                    } else if (SR_SEC_DEBT.length !==0){
+                        // "Net Senior Debt / C4 EBITDA" = (UD_C4_SR_SEC_DEBT - UD_C4_CASH_AND_EQUIVALENTS) / UD_C4_C4_EBITDA
+                        var temp = x;
+                        var netDebt;
+                        var row = document.createElement("tr");
+                        var cell = document.createElement("th")
+                        cell.setAttribute('class', 'summary')
+                        var cellHead = document.createTextNode('UD_C4_SR_SEC_LEVERAGE')
+                        cell.appendChild(cellHead)
+                        row.appendChild(cell)
+                        for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                            
+                            if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                            && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                } 
+                                var ebita =  mnemonicListClone[temp].value_num
+                                if(ebita){
+                                 //  document.write(JSON.stringify(SR_SEC_DEBT))
+                                    if(SR_SEC_DEBT[index2-1].value_num !== 0 || CASH_AND_EQUIVALENTS[index2-1].value_num !==0){
+                                        netDebt = (SR_SEC_DEBT[index2-1].value_num - CASH_AND_EQUIVALENTS[index2-1].value_num)/ebita
+                                        netDebt = netDebt.toFixed(2);
+                                    } else {
+                                        var netDebt = " "
+                                    }
+                                    
+                                } else {
+                                    var netDebt = " "
+                                }
+                                
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(netDebt)
+                                cell.appendChild(cellText)
+                                row.appendChild(cell)
+                                temp++;
+                            } else {
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(" ")
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                            }
+                        
+                        }
+                        tabBody.appendChild(row)
+
+                    }
+                    
+                    if(SR_UNSEC_LEVERAGE.length !== 0){
+
+                        var filtered_SR_UNSEC_LEVERAGE = 
+                        SR_UNSEC_LEVERAGE.filter((item) => item.mnemonic_name === "UD_C4_SR_UNSEC_LEVERAGE")
+                        
+                        var temp = x;
+                        var row = document.createElement("tr");
+                        var cell = document.createElement("th")
+                        cell.setAttribute('class', 'summary')
+                        var cellHead = document.createTextNode('UD_C4_SR_UNSEC_LEVERAGE')
+                        cell.appendChild(cellHead)
+                        row.appendChild(cell)
+                        var count = 0;
+                        for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                            
+                            if (count !== filtered_SR_UNSEC_LEVERAGE.length && filtered_SR_UNSEC_LEVERAGE[count].month_number === distinctSortedClone1[index2].month_number && filtered_SR_UNSEC_LEVERAGE[count].year === distinctSortedClone1[index2].year
+                               && filtered_SR_UNSEC_LEVERAGE[count].time_dimension === distinctSortedClone1[index2].time_dimension)  {
+                                filtered_SR_UNSEC_LEVERAGE[count].value_num = Number(filtered_SR_UNSEC_LEVERAGE[count].value_num)
+                                
+                                if (!Number.isInteger(filtered_SR_UNSEC_LEVERAGE[count].value_num)) {
+                                    filtered_SR_UNSEC_LEVERAGE[count].value_num = filtered_SR_UNSEC_LEVERAGE[count].value_num.toFixed(2);
+                                }
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(filtered_SR_UNSEC_LEVERAGE[count].value_num)
+                                cell.appendChild(cellText)
+                                row.appendChild(cell)
+                                temp++;
+                                count++;
+                            } else {
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(" ")
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                            }
+                            
+                        }
+                        tabBody.appendChild(row)
+
+                    } else if(SR_UNSEC_DEBT.length !== 0){
+                       
+                          // "Net Debt (Cash Pay) / C4 EBITDA" = (UD_C4_SR_UNSEC_DEBT - UD_C4_CASH_AND_EQUIVALENTS) / UD_C4_C4_EBITDA
+                        var temp = x;
+                        var netDebtCP;
+                        var row = document.createElement("tr");
+                        var cell = document.createElement("th")
+                        cell.setAttribute('class', 'summary')
+                        var cellHead = document.createTextNode('UD_C4_SR_UNSEC_LEVERAGE')
+                        cell.appendChild(cellHead)
+                        row.appendChild(cell)
+                        for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                            
+                            if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                            && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                
+                                if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                    mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                              //   document.write(ebita)
+                                } 
+                                var ebita = mnemonicListClone[temp].value_num
+                                if(ebita){
+                                    if(SR_UNSEC_DEBT[index2-1].value_num !==0 || CASH_AND_EQUIVALENTS[index2-1].value_num !==0){
+                                        netDebtCP = (SR_UNSEC_DEBT[index2-1].value_num - CASH_AND_EQUIVALENTS[index2-1].value_num) /ebita
+                                        netDebtCP = netDebtCP.toFixed(2);
+                                    } else {
+                                        var netDebtCP = " "
+                                    }
+                                    
+                                } else {
+                                    var netDebtCP = " "
+                                }
+                                
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(netDebtCP)
+                                cell.appendChild(cellText)
+                                row.appendChild(cell)
+                                temp++;
+                            } else {
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(" ")
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                            }
+                        
+                        }
+                        tabBody.appendChild(row)
+                   }
+
+                   
+                   if(TOTAL_LEVERAGE.length !== 0){
+                        
+                        var filtered_TOTAL_LEVERAGE = 
+                        TOTAL_LEVERAGE.filter((item) => item.value_num !== " ")
+                        var temp = x;
+                        var row = document.createElement("tr");
+                        var cell = document.createElement("th")
+                        cell.setAttribute('class', 'summary')
+                        var cellHead = document.createTextNode('Net Total Debt / C4 EBITDA')
+                        cell.appendChild(cellHead)
+                        row.appendChild(cell)
+                        var count = 0;
+                        for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                            
+                            if (count !== filtered_TOTAL_LEVERAGE.length && filtered_TOTAL_LEVERAGE[count].month_number === distinctSortedClone1[index2].month_number && filtered_TOTAL_LEVERAGE[count].year === distinctSortedClone1[index2].year && filtered_TOTAL_LEVERAGE[count].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                filtered_TOTAL_LEVERAGE[count].value_num = Number(filtered_TOTAL_LEVERAGE[count].value_num)
+                                
+                                if (!Number.isInteger(filtered_TOTAL_LEVERAGE[count].value_num)) {
+                                    filtered_TOTAL_LEVERAGE[count].value_num = filtered_TOTAL_LEVERAGE[count].value_num.toFixed(2);
+                                }
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(filtered_TOTAL_LEVERAGE[count].value_num)
+                                cell.appendChild(cellText)
+                                row.appendChild(cell)
+                                temp++;
+                                count++;
+                            } else {
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(" ")
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                            }
+                            
+                        }
+                        tabBody.appendChild(row)
+
+                    } else if(TOTAL_DEBT.length !== 0){
+                       
+                       // "Net Debt (Cash Pay) / C4 EBITDA" = (UD_C4_SR_UNSEC_DEBT - UD_C4_CASH_AND_EQUIVALENTS) / UD_C4_C4_EBITDA
+                               var temp = x;
+                               var netDebtCP =0;
+                               var row = document.createElement("tr");
+                               var cell = document.createElement("th")
+                               cell.setAttribute('class', 'summary')
+                               var cellHead = document.createTextNode('Net Total Debt / C4 EBITDA')
+                               cell.appendChild(cellHead)
+                               row.appendChild(cell)
+                               for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                                   
+                                   if (mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                                   && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                       mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                                       
+                                       if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                           mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                                     //   document.write(ebita)
+                                       } 
+                                       var ebita = mnemonicListClone[temp].value_num
+                                       if(ebita){
+                                           if(TOTAL_DEBT[index2-1].value_num !==0 || CASH_AND_EQUIVALENTS[index2-1].value_num !==0){
+                                               netDebtCP = (TOTAL_DEBT[index2-1].value_num - CASH_AND_EQUIVALENTS[index2-1].value_num)/ebita
+                                               netDebtCP = netDebtCP.toFixed(2);
+                                           } else {
+                                               var netDebtCP = " "
+                                           }
+                                           
+                                       } else {
+                                           var netDebtCP = " "
+                                       }
+                                       
+                                       var cell = document.createElement("td")
+                                     
+                                       var cellText = document.createTextNode(netDebtCP)
+                                       cell.appendChild(cellText)
+                                       row.appendChild(cell)
+                                       temp++;
+                                   } else {
+                                       var cell = document.createElement("td")
+                                       var cellText = document.createTextNode(" ")
+                                       cell.appendChild(cellText);
+                                       row.appendChild(cell);
+                                   }
+                               
+                               }
+                               tabBody.appendChild(row)
+                          }
+
+
+                }
+
+
+                if(keys[index] === "UD_C4_C4_FCF"){
+                    
+                    var temp = x;
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    cell.setAttribute('class', 'summary')
+                    var cellHead = document.createTextNode('C4 FCF')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                        
+                        if (temp !== mnemonicListClone.length && mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                            && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                            mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                           
+                            if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                            }
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(mnemonicListClone[temp].value_num)
+                            cell.appendChild(cellText)
+                            row.appendChild(cell)
+                            temp++;
+                        } else {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(" ")
+                            cell.appendChild(cellText);
+                            row.appendChild(cell);
+                        }
+                        
+                    }
+                    tabBody.appendChild(row)
+                }
+
+                if(keys[index] === "UD_C4_EV_EBITDA_ADJUSTED"){
+                
+                    var temp = x;
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    cell.setAttribute('class', 'summary')
+                    var cellHead = document.createTextNode('EV / Adj. EBITDA')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let index2 = 1; index2 < distinctSortedClone1.length; index2++) {
+                        
+                       
+                        if (temp !== mnemonicListClone.length && mnemonicListClone[temp].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[temp].year === distinctSortedClone1[index2].year
+                            && mnemonicListClone[temp].mnemonic_name === keys[index] && mnemonicListClone[temp].time_dimension === distinctSortedClone1[index2].time_dimension) {
+                                
+                            mnemonicListClone[temp].value_num = Number(mnemonicListClone[temp].value_num)
+                            
+                            if (!Number.isInteger(mnemonicListClone[temp].value_num)) {
+                                mnemonicListClone[temp].value_num = mnemonicListClone[temp].value_num.toFixed(2);
+                            }
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(mnemonicListClone[temp].value_num)
+                            cell.appendChild(cellText)
+                            row.appendChild(cell)
+                            temp++;
+                        } else {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(" ")
+                            cell.appendChild(cellText);
+                            row.appendChild(cell);
+                        }
+                        
+                    }
+                    tabBody.appendChild(row)
+                }
+
+
+              
+                if (mnemonicListClone[x].mnemonic_name === 'UD_C4_CURRENCY') {
+                            var row = document.createElement("tr");
+                            var cell = document.createElement("th")
+                            cell.setAttribute('class', 'summary')
+                            var cellHead = document.createTextNode('Time Dimension')
+                            cell.appendChild(cellHead)
+                            row.appendChild(cell)
+                    for (let index3 = 1; index3 < distinctSortedClone1.length; index3++) {
+
+                        var cell = document.createElement("td")
+                        if (distinctSortedClone2[index3].time_dimension === 'Y') {
+                            distinctSortedClone2[index3].time_dimension = 'Y'
+                        } else if (distinctSortedClone2[index3].month_number === 12 && distinctSortedClone2[index3].time_dimension === 'Q') {
+                            distinctSortedClone2[index3].time_dimension = 'Q4';
+                        } else if (distinctSortedClone2[index3].month_number === 3 && distinctSortedClone2[index3].time_dimension === 'Q') {
+                            distinctSortedClone2[index3].time_dimension = 'Q1';
+                        } else if (distinctSortedClone2[index3].month_number === 6 && distinctSortedClone2[index3].time_dimension === 'Q') {
+                            distinctSortedClone2[index3].time_dimension = 'Q2';
+                        } else if (distinctSortedClone2[index3].month_number === 9 && distinctSortedClone2[index3].time_dimension === 'Q') {
+                            distinctSortedClone2[index3].time_dimension = 'Q3';
+                        } else if (distinctSortedClone2[index3].month_number === 6 && distinctSortedClone2[index3].time_dimension === 'H') {
+                            distinctSortedClone2[index3].time_dimension = 'H1';
+                        } else if (distinctSortedClone2[index3].month_number === 12 && distinctSortedClone2[index3].time_dimension === 'H') {
+                            distinctSortedClone2[index3].time_dimension = 'H2';
+                        }
+                        else if (distinctSortedClone2[index3].time_dimension === 'YTD' && distinctSortedClone2[index3].month_number === 12) {
+                            distinctSortedClone2[index3].time_dimension = 'YTD Q4';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'YTD' && distinctSortedClone2[index3].month_number === 3) {
+                            distinctSortedClone2[index3].time_dimension = 'YTD Q1';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'YTD' && distinctSortedClone2[index3].month_number === 6) {
+                            distinctSortedClone2[index3].time_dimension = 'YTD Q2';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'YTD' && distinctSortedClone2[index3].month_number === 9) {
+                            distinctSortedClone2[index3].time_dimension = 'YTD Q3';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'LTM' && distinctSortedClone2[index3].month_number === 12) {
+                            distinctSortedClone2[index3].time_dimension = 'LTM Q4';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'LTM' && distinctSortedClone2[index3].month_number === 3) {
+                            distinctSortedClone2[index3].time_dimension = 'LTM Q1';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'LTM' && distinctSortedClone2[index3].month_number === 6) {
+                            distinctSortedClone2[index3].time_dimension = 'LTM Q2';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'LTM' && distinctSortedClone2[index3].month_number === 9) {
+                            distinctSortedClone2[index3].time_dimension = 'LTM Q3';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'HY' && distinctSortedClone2[index3].month_number === 6) {
+                            distinctSortedClone2[index3].time_dimension = 'H1';
+                        } else if (distinctSortedClone2[index3].time_dimension === 'HY' && distinctSortedClone2[index3].month_number === 12) {
+                            distinctSortedClone2[index3].time_dimension = 'H2';
+                        }
+                        var cellText = document.createTextNode(distinctSortedClone2[index3].time_dimension)
+                        cell.appendChild(cellText);
+                        row.appendChild(cell);
+                        cell.setAttribute('class', 'summary')
+                        
+                    }
+                    tabBody.appendChild(row);
+                }
+
+                
+                if (mnemonicListClone[x].mnemonic_name === 'UD_C4_COMPANY_NAME') {
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    cell.setAttribute('class', 'summary')
+                    var cellHead = document.createTextNode('YEAR')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let index3 = 1; index3 < distinctSortedClone1.length; index3++) {
+
+                        var cell = document.createElement("td")
+                        var cellText = document.createTextNode(distinctSortedClone1[index3].year)
+                        cell.appendChild(cellText);
+                        row.appendChild(cell);
+                    }
+                    tabBody.appendChild(row);
+                }
+                    
+                var mnemonicName = mnemonicListClone[x].mnemonic_name;
+
+                for (let index2 = 0; index2 < distinctSortedClone1.length; index2++) {
+                    if(mnemonicListClone[x].month_number === distinctSortedClone1[index2].month_number && mnemonicListClone[x].year === distinctSortedClone1[index2].year
+                    && mnemonicListClone[x].mnemonic_name === keys[index] && mnemonicListClone[x].time_dimension === distinctSortedClone1[index2].time_dimension){
+                            if (x === mnemonicListClone.length - 1) {
+                                // document.write("VANILLA")
+                                x = x;
+
+                            } else {
+
+                                x++;
+                            }
+                        }
+                } 
+
+               
+
+                tab.appendChild(tabBody)
+                tab.setAttribute('class', 'margin')
+                body.appendChild(tab)
+            
+            
+            }
+
+
+            var table = document.createElement("table");
+            var tableBody = document.createElement("tbody");
+            //document.write(JSON.stringify(obj2))
+            var c = 0;
+            for (let index = 0; index < Object.keys(obj2).length; index++) {
+
+                if (keys[index] === "UD_C4_CALENDAR_DATE") {
+                    continue;
+                }
+
+                if (keys[index - 2] === "UD_C4_CURRENCY") {
+
+                    var row = document.createElement("tr");
+                    var cell = document.createElement("th")
+                    var cellHead = document.createTextNode('UD_C4_CALENDAR_DATE')
+                    cell.appendChild(cellHead)
+                    row.appendChild(cell)
+                    for (let i = 0; i < distinctSorted.length; i++) {
+                        if (distinctSorted[i].as_of_date === null) {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(" ")
+
+                        } else {
+                            var cell = document.createElement("td")
+                            distinctSorted[i].as_of_date = distinctSorted[i].as_of_date.substring(0, distinctSorted[i].as_of_date.indexOf("T"));
+                            var cellText = document.createTextNode(distinctSorted[i].as_of_date)
+                            cell.setAttribute('class', 'date')
+                        }
+
+                        cell.appendChild(cellText)
+                        row.appendChild(cell)
+                    }
+                    tableBody.appendChild(row);
+                }
+
+
+                var row = document.createElement("tr");
+
+                var cell = document.createElement("th")
+                var cellHead = document.createTextNode(keys[index])
+                //document.write(keys[index] + "dd</br>")
+                cell.appendChild(cellHead)
+                row.appendChild(cell)
+                var count = 0, i = 1
+
+                for (let index2 = 0; index2 < distinctSorted.length; index2++) {
+                    //document.write(distinctSorted.length)
+                    if (mnemonicList[c].month_number === distinctSorted[index2].month_number && mnemonicList[c].year === distinctSorted[index2].year
+                        && mnemonicList[c].mnemonic_name === keys[index] && mnemonicList[c].time_dimension === distinctSorted[index2].time_dimension
+                    ) {
+                        if (distinctSorted[index2].time_dimension !== null) {
+                            if (mnemonicList[c].value_num !== null) {
+
+
+                                mnemonicList[c].value_num = Number(mnemonicList[c].value_num)
+                                if (!Number.isInteger(mnemonicList[c].value_num)) {
+                                    mnemonicList[c].value_num = mnemonicList[c].value_num.toFixed(2);
+                                }
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(mnemonicList[c].value_num)
+
+                                //   document.write(c + "\t")
+                                //   document.write(mnemonics.mnemonicList[c].value_num)
+                            }
+
+                            else {
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(mnemonicList[c].value_text)
+                            }
+
+                            // console.log(mnemonics.mnemonicList[c].value_num)
+                        } else {
+                            var cell = document.createElement("td")
+                            var cellText = document.createTextNode(mnemonicList[c].value_text)
+                        }
+                        //  var cellText = text.toFixed(2);
+
+                        if (distinctSorted[index2].time_dimension === null) {
+                            cell.setAttribute('class', 'text')
+                        }
+                        cell.appendChild(cellText);
+                        row.appendChild(cell);
+                        if (mnemonicList[c].mnemonic_name === 'UD_C4_CURRENCY') {
+                            for (let index3 = 1; index3 < distinctSorted.length; index3++) {
+                                var cell = document.createElement("td")
+                                if (distinctSortedClone[index3].time_dimension === 'Y') {
+                                    distinctSortedClone[index3].time_dimension = 'Y'
+                                } else if (distinctSortedClone[index3].month_number === 12 && distinctSortedClone[index3].time_dimension === 'Q') {
+                                    distinctSortedClone[index3].time_dimension = 'Q4';
+                                } else if (distinctSortedClone[index3].month_number === 3 && distinctSortedClone[index3].time_dimension === 'Q') {
+                                    distinctSortedClone[index3].time_dimension = 'Q1';
+                                } else if (distinctSortedClone[index3].month_number === 6 && distinctSortedClone[index3].time_dimension === 'Q') {
+                                    distinctSortedClone[index3].time_dimension = 'Q2';
+                                } else if (distinctSortedClone[index3].month_number === 9 && distinctSortedClone[index3].time_dimension === 'Q') {
+                                    distinctSortedClone[index3].time_dimension = 'Q3';
+                                } else if (distinctSortedClone[index3].month_number === 6 && distinctSortedClone[index3].time_dimension === 'H') {
+                                    distinctSortedClone[index3].time_dimension = 'H1';
+                                } else if (distinctSortedClone[index3].month_number === 12 && distinctSortedClone[index3].time_dimension === 'H') {
+                                    distinctSortedClone[index3].time_dimension = 'H2';
+                                }
+                                else if (distinctSortedClone[index3].time_dimension === 'YTD' && distinctSortedClone[index3].month_number === 12) {
+                                    distinctSortedClone[index3].time_dimension = 'YTD Q4';
+                                } else if (distinctSortedClone[index3].time_dimension === 'YTD' && distinctSortedClone[index3].month_number === 3) {
+                                    distinctSortedClone[index3].time_dimension = 'YTD Q1';
+                                } else if (distinctSortedClone[index3].time_dimension === 'YTD' && distinctSortedClone[index3].month_number === 6) {
+                                    distinctSortedClone[index3].time_dimension = 'YTD Q2';
+                                } else if (distinctSortedClone[index3].time_dimension === 'YTD' && distinctSortedClone[index3].month_number === 9) {
+                                    distinctSortedClone[index3].time_dimension = 'YTD Q3';
+                                } else if (distinctSortedClone[index3].time_dimension === 'LTM' && distinctSortedClone[index3].month_number === 12) {
+                                    distinctSortedClone[index3].time_dimension = 'LTM Q4';
+                                } else if (distinctSortedClone[index3].time_dimension === 'LTM' && distinctSortedClone[index3].month_number === 3) {
+                                    distinctSortedClone[index3].time_dimension = 'LTM Q1';
+                                } else if (distinctSortedClone[index3].time_dimension === 'LTM' && distinctSortedClone[index3].month_number === 6) {
+                                    distinctSortedClone[index3].time_dimension = 'LTM Q2';
+                                } else if (distinctSortedClone[index3].time_dimension === 'LTM' && distinctSortedClone[index3].month_number === 9) {
+                                    distinctSortedClone[index3].time_dimension = 'LTM Q3';
+                                } else if (distinctSortedClone[index3].time_dimension === 'HY' && distinctSortedClone[index3].month_number === 6) {
+                                    distinctSortedClone[index3].time_dimension = 'H1';
+                                } else if (distinctSortedClone[index3].time_dimension === 'HY' && distinctSortedClone[index3].month_number === 12) {
+                                    distinctSortedClone[index3].time_dimension = 'H2';
+                                }
+                                var cellText = document.createTextNode(distinctSortedClone[index3].time_dimension)
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+                                cell.setAttribute('class', 'date')
+
+                            }
+                        }
+
+                        if (mnemonicList[c].mnemonic_name === 'UD_C4_COMPANY_NAME') {
+
+                            for (let index3 = 1; index3 < distinctSorted.length; index3++) {
+
+                                var cell = document.createElement("td")
+                                var cellText = document.createTextNode(distinctSorted[index3].year)
+                                cell.appendChild(cellText);
+                                row.appendChild(cell);
+
+
+                            }
+                        }
+
+
+
+                        if (c === mnemonicList.length - 1) {
+                            // document.write("VANILLA")
+                            c = c;
+
+                        } else {
+
+                            c++;
+                        }
+
+                    } else {
+                        var cell = document.createElement("td")
+                        var cellText = document.createTextNode(" ")
+                        cell.appendChild(cellText);
+                        row.appendChild(cell);
+                    }
+                }
+
+                tableBody.appendChild(row);
+            }
+
+            table.appendChild(tableBody)
+            body.appendChild(table)
+
+
+
+
+            return true;
+        }
+
+
+    </script>
+
+</head>
+
+<body>
+    <!-- <div id="demo"> Text inside Dialog </div> -->
+    <script>
+
+        loadData()
+
+    </script>
+    <!-- <input type="button" value="Generate a table." onclick="generateTable()"> -->
+    <div id="showData"></div>
+</body>
+
+
+</html>

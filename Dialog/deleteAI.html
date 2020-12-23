@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link href="//db.onlinewebfonts.com/c/30b398369e663efafd064e1d824f9567?family=TeXGyreAdventor" rel="stylesheet" type="text/css"/> -->
+    <!-- <script src='https://kit.fontawesome.com/a076d05399.js'></script> -->
+    <link rel="stylesheet" href="../assets/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/Office.js" type="text/javascript"></script>
+    <title>Capital Four Research Management System - Delete Issuer </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+
+        }
+
+        body {
+            height: 100%;
+            background: linear-gradient(rgb(208, 253, 223), white);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        :root {
+            --black: #0ff050;
+            --yellow: #ff0000;
+        }
+
+        .container{
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(7, 1fr);
+           
+        }
+
+        .item {
+            display: grid;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+
+        }
+
+         .item1 {
+            grid-row-start: 1;
+            grid-row: span 2;
+            margin-left: 40px;
+            margin-right: 20px;
+        } 
+
+        .item2 {
+            grid-row-start: 1;
+            grid-column: 2/-1;
+           
+            justify-content: left;
+            font-size: 20px;
+           
+            font-weight: bold;
+
+        }
+
+        .item3 {
+            grid-row-start: 2;
+            grid-column: 2/-1;
+            justify-content: left;
+            font-size: 20px;
+            margin: 10px 0px 10px 0px;
+        }
+
+        .item6{
+            grid-row-start: 3;
+            grid-column-start: 3;
+            grid-column-end: 6;
+            justify-content: left;
+            font-size: 20px;
+            margin: 10px 0px 0px 0px;
+        }
+        .item7{
+            grid-row-start: 4;
+            grid-column-start: 3;
+            grid-column-end: 6;
+            justify-content: left;
+            font-size: 20px;
+            margin: 0px 0px 0px 0px;
+        }
+        .item8{
+            grid-row-start: 5;
+            grid-column-start: 3;
+            grid-column-end: 6;
+            justify-content: left;
+            font-size: 20px;
+            margin: 0px 0px 0px 0px;
+        }
+        .item9{
+            grid-row-start: 6;
+            grid-column-start: 3;
+            grid-column-end: 6;
+            justify-content: left;
+            font-size: 20px;
+            margin: 0px 0px 10px 0px;
+        }
+
+        .item4 {
+            grid-row-start: 7;
+            grid-column-start: 3;
+            grid-column-end: 6;
+            justify-content: left;
+            font-size: 20px;
+            margin: 10px 0px 10px 0px;
+        }
+
+        .item5 {
+            grid-row-start: 7;
+            grid-column-start: 4;
+            grid-column-end: 5;
+            justify-content: left;
+            font-size: 20px;
+            margin: 10px 0px 10px 0px;
+        }
+
+       
+
+
+        .button {
+            
+            border: none;
+            color: white;
+            padding: 6px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            }
+
+        .button1 {
+            background-color: #ff0000; 
+            color: white; 
+            
+            }
+
+        .button1:hover {
+            background-color: #dcdcdc;
+            color: black;
+            }
+
+        .button2 {
+            background-color: #eeeeee; 
+            color: black; 
+           
+            }
+
+        .button2:hover {
+            background-color: #dcdcdc;
+            color: black;
+            }
+
+
+    </style>
+
+
+
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="item item1">
+            <i class='fa fa-question-circle' style='font-size:68px;color:#0a9fd1; '></i>
+        </div>
+
+        <div id="header" class="item item2">
+
+        </div>
+
+        <div id="text" class="item item3">
+        
+        </div>
+
+        <div class = "item item6">  <b> UD_C4_Company_ID: </b> <p id = "companyIDDisplay"></p></div>
+        <div class = "item item7" > <b> Issuer ID: </b>  <p id = "issuerId"></p></div>
+        <div class = "item item8">  <b> Issuer Name: </b> <p id = "issuerName"></p></div>
+        <div class = "item item9">  <b> Bond Ticker: </b> <p id = "bondTicker"></p></div>
+        
+      
+       
+
+
+        <div class ="item item4">
+            <button class = "button button1" onclick=closeButtonClick(true) > Yes </button>
+        </div>
+
+        <div class= "item item5">
+            <button 
+            class="button button2" onclick=closeButtonClick(false)> Cancel </button>
+        </div>
+    
+
+    </div>
+
+    <script>
+        // function closeButtonClick() {
+        //     var messageObject = {messageType: "dialogClosed"};
+        //     var jsonMessage = JSON.stringify(messageObject);
+        //     Office.context.ui.messageParent(jsonMessage);
+
+        // }
+
+       
+        function closeButtonClick(arg) {
+
+            if(arg){
+           
+            var messageObject = {messageType: "Yes"};
+            var jsonMessage = JSON.stringify(messageObject);
+            Office.context.ui.messageParent(jsonMessage);
+            } else {
+                
+            var messageObject = {messageType: "No"};
+            var jsonMessage = JSON.stringify(messageObject);
+            Office.context.ui.messageParent(jsonMessage);
+            }
+        }
+
+
+
+
+        function loadData() {
+            var error = JSON.parse(localStorage.getItem('error'));
+            console.log(error);
+            var issuerDetails = JSON.parse(localStorage.getItem('issuerDetails'))
+            var companyID = JSON.parse(localStorage.getItem('companyID'))
+         //  document.write(JSON.stringify(issuerDetails))
+            document.getElementById('header').innerHTML = error.header;
+            document.getElementById('text').innerHTML = error.text;
+            document.getElementById('companyIDDisplay').innerHTML = companyID[0].value;
+            document.getElementById('issuerId').innerHTML = issuerDetails.issuerId;
+            document.getElementById('issuerName').innerHTML = issuerDetails.issuerName;
+            document.getElementById('bondTicker').innerHTML = issuerDetails.bondTicker;
+
+           // document.getElementById('equityTicker').innerHTML = issuerDetails.equityTicker;
+
+            return true;
+        }
+        loadData();
+    </script>
+</body>
+
+</html>
